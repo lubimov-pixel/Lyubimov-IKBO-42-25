@@ -59,3 +59,73 @@ sh tests/scripts/vfs_deep.sh
 python3 src/main.py --vfs tests/vfs/deep \
   --script tests/startup/stage4.emu --no-interactive
 ```
+
+## Этап 5. Дополнительные команды
+
+- `mkdir DIR [DIR...]` — создать новые каталоги только в памяти VFS.
+- `rm FILE [FILE...]` — удалить файлы только в памяти VFS; для
+  безопасности каталоги не удаляются (рекурсивный режим отсутствует).
+- `vfs-init` — особая служебная команда, которая **в отличие от `rm`**
+  очищает и физическое представление загруженной VFS.
+- `exit` — завершить работу эмулятора.
+
+```bash
+python3 src/main.py --vfs tests/vfs/deep \
+  --script tests/startup/stage5.emu --no-interactive
+sh tests/scripts/test_reset.sh
+```
+
+## Структура проекта
+
+```text
+src/              исходники парсера, VFS и команд
+ tests/           модульные тесты и примеры запуска
+ tests/startup/   сценарии команд эмулятора
+ tests/scripts/   сценарии реальной оболочки ОС
+ tests/vfs/       минимальная, простая и вложенная VFS
+ run.sh          запуск в Linux/macOS
+ run.bat         запуск в Windows
+ Makefile        запуск, тесты и демонстрация
+```
+
+## Запуск и тестирование
+
+Необходим Python версии 3.9 или новее. Дополнительные пакеты не нужны.
+На Windows можно использовать `run.bat` вместо `run.sh`.
+
+```bash
+./run.sh --vfs tests/vfs/deep
+./run.sh --script tests/startup/stage4.emu --no-interactive
+make test
+# или универсальный способ:
+python3 -m unittest discover -s tests -v
+```
+
+Синтаксис переменных окружения: `ls $HOME` на UNIX-подобных ОС. На Windows
+для раскрытия переменных с помощью `os.path.expandvars` можно использовать
+`%USERPROFILE%`. Кавычки для группировки аргументов поддерживаются.
+
+Сценарии `stage2.emu`–`stage5.emu` включают ошибочные команды, чтобы
+проверить сообщение об ошибке и продолжение выполнения скрипта.
+Скрипт `test_reset.sh` создает временную директорию и проверяет физическое
+удаление только в ней, не затрагивая тестовые исходные данные.
+
+## Демонстрация
+
+```text
+deep:/$ ls
+docs  motd
+deep:/$ cd docs
+deep:/docs$ uniq values.txt
+alpha
+beta
+alpha
+deep:/docs$ mkdir temp
+deep:/docs$ ls
+projects  temp  values.txt
+```
+
+## История разработки
+
+История Git сохраняет пять этапов в формате Conventional Commits:
+`feat(repl)`, `feat(config)`, `feat(vfs)`, `feat(commands)`, `feat(edit)`.

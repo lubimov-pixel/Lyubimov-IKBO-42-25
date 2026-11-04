@@ -3,7 +3,7 @@
 import getpass
 import os
 
-from vfs import VFS
+from vfs import Node, VFS
 
 
 class CommandError(ValueError):
@@ -74,3 +74,29 @@ def command_uniq(shell, args):
         if line != previous:
             print(line)
         previous = line
+
+
+def command_mkdir(shell, args):
+    """Create one or more new directories in virtual memory only."""
+    if not args:
+        raise CommandError("mkdir: expected at least one directory")
+    for name in args:
+        path = resolve(shell, name)
+        parent, basename = shell.vfs.parent(path)
+        if basename in parent.children:
+            raise FileExistsError(path)
+        parent.children[basename] = Node(True)
+
+
+def command_rm(shell, args):
+    """Remove virtual files; reject directories without a recursive flag."""
+    if not args:
+        raise CommandError("rm: expected a file path")
+    for name in args:
+        path = resolve(shell, name)
+        parent, basename = shell.vfs.parent(path)
+        if basename not in parent.children:
+            raise FileNotFoundError(path)
+        if parent.children[basename].directory:
+            raise IsADirectoryError(path)
+        del parent.children[basename]

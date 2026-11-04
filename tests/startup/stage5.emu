@@ -1,0 +1,13 @@
+# Virtual modifications only
+ls
+mkdir sandbox
+ls
+cd sandbox
+mkdir inner
+ls
+cd /
+rm docs/values.txt
+ls docs
+rm docs
+rm missing.txt
+mkdir sandbox

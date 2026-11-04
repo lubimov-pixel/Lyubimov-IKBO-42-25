@@ -4,7 +4,7 @@ from parser import ParseError, parse_command
 from vfs import VFS
 from commands import (
     CommandError, command_cat, command_cd, command_ls,
-    command_uniq, command_who,
+    command_mkdir, command_rm, command_uniq, command_who,
 )
 
 
@@ -85,4 +85,6 @@ COMMANDS = {
     "cat": command_cat,
     "who": command_who,
     "uniq": command_uniq,
+    "mkdir": command_mkdir,
+    "rm": command_rm,
 }
