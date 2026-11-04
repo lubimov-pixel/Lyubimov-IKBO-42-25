@@ -1,0 +1,4 @@
+# Source loading and errors
+ls
+cd /docs
+invalid-command

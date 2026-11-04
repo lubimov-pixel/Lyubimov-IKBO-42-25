@@ -4,6 +4,7 @@ import argparse
 from pathlib import Path
 
 from shell import Shell
+from vfs import VFS
 
 
 def run_script(shell, path):
@@ -38,7 +39,14 @@ def main():
     print(f"[debug] script = {args.script or '<not set>'}")
     print(f"[debug] no_interactive = {args.no_interactive}")
     name = Path(args.vfs).name if args.vfs else "default"
-    shell = Shell(name)
+    try:
+        vfs = VFS(args.vfs)
+    except (OSError, ValueError) as exc:
+        parser.exit(1, f"VFS error: {exc}\n")
+    shell = Shell(name, vfs)
+    message = vfs.motd()
+    if message:
+        print(message, end="" if message.endswith("\n") else "\n")
     if args.script:
         run_script(shell, args.script)
     if shell.running and not args.no_interactive:

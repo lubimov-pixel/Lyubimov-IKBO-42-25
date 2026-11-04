@@ -1,14 +1,17 @@
 """Interactive shell entry point and execution loop."""
 
 from parser import ParseError, parse_command
+from vfs import VFS
 
 
 class Shell:
     """Provide a simple REPL with initially stubbed commands."""
 
-    def __init__(self, vfs_name="default"):
+    def __init__(self, vfs_name="default", vfs=None):
         self.vfs_name = vfs_name
         self.running = True
+        self.vfs = vfs if vfs is not None else VFS()
+        self.cwd = "/"
 
     @property
     def prompt(self):
@@ -30,6 +33,17 @@ class Shell:
                 print("exit: too many arguments")
                 return False
             self.running = False
+        elif name == "vfs-init":
+            if args:
+                print("vfs-init: no arguments expected")
+                return False
+            try:
+                self.vfs.reset()
+                self.cwd = "/"
+                print("VFS reset to default")
+            except (OSError, ValueError) as exc:
+                print(f"vfs-init: {exc}")
+                return False
         elif name in {"ls", "cd"}:
             print(f"{name}: args={args}")
         else:
