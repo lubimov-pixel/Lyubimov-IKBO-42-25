@@ -1,0 +1,14 @@
+# Basic commands
+ls
+cd docs
+ls
+cat values.txt
+uniq values.txt
+cd projects/app
+cat readme.txt
+who
+cd /
+ls missing.txt
+cat docs
+uniq missing.txt
+cd motd

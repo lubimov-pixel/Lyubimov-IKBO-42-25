@@ -2,6 +2,10 @@
 
 from parser import ParseError, parse_command
 from vfs import VFS
+from commands import (
+    CommandError, command_cat, command_cd, command_ls,
+    command_uniq, command_who,
+)
 
 
 class Shell:
@@ -16,7 +20,7 @@ class Shell:
     @property
     def prompt(self):
         """Return the current command prompt."""
-        return f"{self.vfs_name}:/$ "
+        return f"{self.vfs_name}:{self.cwd}$ "
 
     def execute(self, line):
         """Execute one command and report success or failure."""
@@ -44,8 +48,12 @@ class Shell:
             except (OSError, ValueError) as exc:
                 print(f"vfs-init: {exc}")
                 return False
-        elif name in {"ls", "cd"}:
-            print(f"{name}: args={args}")
+        elif name in COMMANDS:
+            try:
+                COMMANDS[name](self, args)
+            except (CommandError, OSError, ValueError) as exc:
+                print(f"error: {exc}")
+                return False
         else:
             print(f"{name}: command not found")
             return False
@@ -69,3 +77,12 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+COMMANDS = {
+    "ls": command_ls,
+    "cd": command_cd,
+    "cat": command_cat,
+    "who": command_who,
+    "uniq": command_uniq,
+}
