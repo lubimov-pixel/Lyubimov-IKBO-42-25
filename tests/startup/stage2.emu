@@ -1,0 +1,5 @@
+# Environment variable expansion
+ls $HOME
+cd /tmp
+not-a-command
+ls "quoted value"
