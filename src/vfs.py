@@ -103,8 +103,10 @@ class VFS:
         source = self.source
         if source is None or source.is_symlink() or not source.is_dir():
             raise ValueError("unsafe VFS source")
-        if source == Path(source.anchor) or source == Path.home():
-            raise ValueError("refusing to reset a root or home directory")
+        protected = (Path.cwd().resolve(), Path.home().resolve())
+        if any(directory == source or directory.is_relative_to(source)
+               for directory in protected):
+            raise ValueError("refusing to reset a working or home directory")
         for item in source.iterdir():
             self._remove_disk_item(item)
 
